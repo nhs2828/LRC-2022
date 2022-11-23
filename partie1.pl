@@ -40,4 +40,27 @@ assert_role([(michelAnge, david, aCree), (michelAnge, sonnet, aEcrit),(vinci,
 joconde, aCree)]).
 
 %Correction sémantique
+testcnamea(X):- setof(Y, cnamea(Y), L), member(X,L).
+testcnamena(X):- setof(Y, cnamena(Y), L), member(X,L).
+testiname(X):- setof(Y, iname(Y), L), member(X,L).
 testrname(X):- setof(Y, rname(Y), L), member(X,L).
+%Concept
+concept(X):- testcnamea(X).
+concept(not(X)):- concept(X).
+concept(and(X,Y)):- concept(X), concept(Y).
+concept(or(X,Y)):- concept(X), concept(Y).
+concept(some(R,X)):- testrname(R), concept(X).
+concept(all(R,X)):- testrname(R), concept(X).
+%Autoref
+autoref(X,X,_,_).
+autoref(X,A,[(X,_)|L],Lbase):- autoref(X,A,L,Lbase).
+autoref(X,A,[(Y,_)|L],Lbase):- testcnamena(A), Y \= A,autoref(X,A,L,Lbase).
+autoref(X,A,[(A,Y)|_],Lbase):- testcnamena(A), autoref(X,Y,Lbase,Lbase).
+autoref(X,not(A),_,Lbase):- autoref(X,A,Lbase,Lbase).
+autoref(X,and(A,B),_,Lbase):-autoref(X,A,Lbase,Lbase); autoref(X,B,Lbase,Lbase).
+autoref(X,or(A,B),_,Lbase):- autoref(X,A,Lbase,Lbase); autoref(X,B,Lbase,Lbase).
+autoref(X,some(_,A),_,Lbase):- autoref(X,A,Lbase,Lbase).
+autoref(X,all(_,A),_,Lbase):- autoref(X,A,Lbase,Lbase).
+
+
+
