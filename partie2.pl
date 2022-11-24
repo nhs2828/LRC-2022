@@ -13,16 +13,10 @@ suite(R,Abi,Abi1,Tbox) :-
   nl,write('Cette réponse est inccorecte.'),
   nl,saisie_et_traitement_prop_a_demontrer(Abi,Abi1,Tbox).
 
-/* nnf : met sous forme normale négative une expression conceptuelle dans
-la logique de description ALC */
-nnf(not(and(C1,C2)),or(NC1,NC2)):- nnf(not(C1),NC1),nnf(not(C2),NC2),!.
-nnf(not(or(C1,C2)),and(NC1,NC2)):- nnf(not(C1),NC1),nnf(not(C2),NC2),!.
-nnf(not(all(R,C)),some(R,NC)):- nnf(not(C),NC),!.
-nnf(not(some(R,C)),all(R,NC)):- nnf(not(C),NC),!.
-nnf(not(not(X)),X):-!.
-nnf(not(X),not(X)):-!.
-nnf(and(C1,C2),and(NC1,NC2)):- nnf(C1,NC1),nnf(C2,NC2),!.
-nnf(or(C1,C2),or(NC1,NC2)):- nnf(C1,NC1), nnf(C2,NC2),!.
-nnf(some(R,C),some(R,NC)):- nnf(C,NC),!.
-nnf(all(R,C),all(R,NC)) :- nnf(C,NC),!.
-nnf(X,X).
+%acquisition_prop_type1
+acquisition_prop_type1([],[],_).
+acquisition_prop_type1([X|Abi],[Y|Abi1],Tbox):-traitement_Abox(not(X),Y,Tbox), acquisition_prop_type1(Abi,Abi1,Tbox).
+
+%acquisition_prop_type2
+acquisition_prop_type2([],[],_).
+acquisition_prop_type2([and(X1,X2)|Abi],[Y|Abi1],Tbox):-traitement_Abox(and(X1,X2),Y,Tbox), acquisition_prop_type2(Abi,Abi1,Tbox).
