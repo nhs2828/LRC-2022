@@ -1,3 +1,18 @@
+%nnf
+nnf(not(and(C1,C2)),or(NC1,NC2)):- nnf(not(C1),NC1),
+                                   nnf(not(C2),NC2),!.
+nnf(not(or(C1,C2)),and(NC1,NC2)):- nnf(not(C1),NC1),
+                                   nnf(not(C2),NC2),!.
+nnf(not(all(R,C)),some(R,NC)):- nnf(not(C),NC),!.
+nnf(not(some(R,C)),all(R,NC)):- nnf(not(C),NC),!.
+nnf(not(not(X)),X):-!.
+nnf(not(X),not(X)):-!.
+nnf(and(C1,C2),and(NC1,NC2)):- nnf(C1,NC1),nnf(C2,NC2),!.
+nnf(or(C1,C2),or(NC1,NC2)):- nnf(C1,NC1), nnf(C2,NC2),!.
+nnf(some(R,C),some(R,NC)):- nnf(C,NC),!.
+nnf(all(R,C),all(R,NC)) :- nnf(C,NC),!.
+nnf(X,X).
+
 equiv(sculpteur,and(personne,some(aCree,sculpture))).
 equiv(auteur,and(personne,some(aEcrit,livre))).
 equiv(editeur,and(personne,and(not(some(aEcrit,livre)),some(aEdite,livre)))).
@@ -65,6 +80,12 @@ autoref(X,and(A,B),_,Lbase):-autoref(X,A,Lbase,Lbase); autoref(X,B,Lbase,Lbase).
 autoref(X,or(A,B),_,Lbase):- autoref(X,A,Lbase,Lbase); autoref(X,B,Lbase,Lbase).
 autoref(X,some(_,A),_,Lbase):- autoref(X,A,Lbase,Lbase).
 autoref(X,all(_,A),_,Lbase):- autoref(X,A,Lbase,Lbase).
+
+%traitement_Tbox
+traitement_Tbox(X,Y,[(_,B)|LTBOX]):- X\=B, traitement_Tbox(X,Y,LTBOX).
+traitement_Tbox(X,Y,[(A,X)|_]):-concept(X), equiv(A,X), nnf(X,Y).
+
+%traitement_Abox
 
 
 
