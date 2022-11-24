@@ -81,11 +81,23 @@ autoref(X,or(A,B),_,Lbase):- autoref(X,A,Lbase,Lbase); autoref(X,B,Lbase,Lbase).
 autoref(X,some(_,A),_,Lbase):- autoref(X,A,Lbase,Lbase).
 autoref(X,all(_,A),_,Lbase):- autoref(X,A,Lbase,Lbase).
 
-%traitement_Tbox
-traitement_Tbox(X,Y,[(_,B)|LTBOX]):- X\=B, traitement_Tbox(X,Y,LTBOX).
-traitement_Tbox(X,Y,[(A,X)|_]):-concept(X), equiv(A,X), nnf(X,Y).
+%remplacer Tbox
+remplacerTbox(X,X,_):-concept(X).
+remplacerTbox(X,Y,[(X,Y)|_]).
+remplacerTbox(X,Y,[(A,_)|LTbox]):- X\=A, remplacerTbox(X,Y,LTbox).
+remplacerTbox(not(X),not(Y),LTbox):-remplacerTbox(X,Y,LTbox).
+remplacerTbox(and(X1,X2),and(Y1,Y2),LTbox):-remplacerTbox(X1,Y1,LTbox),remplacerTbox(X2,Y2,LTbox),!.
+remplacerTbox(or(X1,X2),or(Y1,Y2),LTbox):-remplacerTbox(X1,Y1,LTbox),remplacerTbox(X2,Y2,LTbox),!.
+remplacerTbox(some(R,X),or(R,Y),LTbox):-remplacerTbox(X,Y,LTbox),!.
+remplacerTbox(all(R,X),or(R,Y),LTbox):-remplacerTbox(X,Y,LTbox),!.
 
-%traitement_Abox
+%traitement Tbox
+traitement_Tbox(X,Y,[(_,B)|LTBOX]):- X\=B, traitement_Tbox(X,Y,LTBOX).
+traitement_Tbox(X,Y,[(A,X)|_]):- concept(X), equiv(A,X), nnf(X,Y).
+
+%traitement Abox
+traitement_Abox(X,X,_):- concept(X).
+traitement_Abox(X,Y,LTbox):- not(concept(X)), remplacerTbox(X,Y,LTbox).
 
 
 
