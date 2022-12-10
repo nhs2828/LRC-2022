@@ -1,5 +1,3 @@
-:- [partie1.pl].
-
 deuxieme_etape(Abi,Abi1,Tbox) :- saisie_et_traitement_prop_a_demontrer(Abi,Abi1,Tbox).
 
 saisie_et_traitement_prop_a_demontrer(Abi,Abi1,Tbox) :-

@@ -3,7 +3,7 @@ troisieme_etape(Abi,Abr) :-
   resolution(Lie,Lpt,Li,Lu,Ls,Abr),
   nl,write('Youpiiiiii, on a demontre la proposition initiale !!!').
 
-% Tri les assertions de la Abox étendue
+%--- Tri les assertions de la Abox étendue
 tri_Abox([],[],[],[],[],[]).
 % Lie <- Assertions de type (I,some(R,C))
 tri_Abox([(I,some(R,C))|Abi],[(I,some(R,C))|Lie],Lpt,Li,Lu,Ls) :- 
@@ -24,3 +24,12 @@ tri_Abox([(I,C)|Abi],Lie,Lpt,Li,Lu,[(I,C)|Ls]) :-
 tri_Abox([(I,not(C))|Abi],Lie,Lpt,Li,Lu,[(I,not(C))|Ls]) :- 
   tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),!.
 
+%--- Résolution
+% ∃R.C
+complete_some(Lie,Lpt,Li,Lu,Ls,Abr).
+% C ⊓ D
+transformation_and(Lie,Lpt,Li,Lu,Ls,Abr).
+% ∀R.C
+deduction_all(Lie,Lpt,Li,Lu,Ls,Abr).
+% C ⊔ D
+transformation_or(Lie,Lpt,Li,Lu,Ls,Abr).
