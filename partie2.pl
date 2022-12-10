@@ -1,9 +1,11 @@
+:- [partie1.pl].
+
 deuxieme_etape(Abi,Abi1,Tbox) :- saisie_et_traitement_prop_a_demontrer(Abi,Abi1,Tbox).
 
 saisie_et_traitement_prop_a_demontrer(Abi,Abi1,Tbox) :-
   nl,write('Entrer le numéro du type de proposition que l\'on souhaite démontrer :'),
   nl,write('\t1 - Une instance donnée appartient à un concept donné.'),
-  nl,write('\t2 - Deux concepts n\'ont pas d\'éléments en commun (ils ont une intersection vide).')
+  nl,write('\t2 - Deux concepts n\'ont pas d\'éléments en commun (ils ont une intersection vide).'),
   nl,read(R),
   suite(R,Abi,Abi1,Tbox).
 

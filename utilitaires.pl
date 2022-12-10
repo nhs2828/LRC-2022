@@ -37,7 +37,7 @@ chiffre_car(5,'5').
 chiffre_car(6,'6').
 chiffre_car(7,'7').
 chiffre_car(8,'8').
-chiffre_car(9,’9’).
+chiffre_car(9,'9').
 
 /* flatten(Liste1,Liste2) : Aplanit Liste1 et met le résultat dans Liste2. Liste1 peut 
 contenir de nombreuses listes imbriquées récursivement. flatten/2 extrait tous les 
