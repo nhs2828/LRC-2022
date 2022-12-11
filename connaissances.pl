@@ -36,9 +36,17 @@ instR(michelAnge, david, aCree).
 instR(michelAnge, sonnets, aEcrit).
 instR(vinci, joconde, aCree).
 
-% Tbox
-[(sculpteur,and(personne,some(aCree,sculpture))), (auteur,and(personne,some(aEcrit,livre))), (editeur,and(personne,and(not(some(aEcrit,livre)),some(aEdite,livre)))), (parent,and(personne,some(aEnfant,anything)))].
-% Abox
-[(michelAnge,personne), (david,sculpture), (sonnets,livre), (vinci,personne), (joconde,objet)].
-% assertions de rôles
-[(michelAnge, david, aCree), (michelAnge, sonnet, aEcrit),(vinci, joconde, aCree)].
+tbox([(sculpteur,and(personne,some(aCree,sculpture))), 
+      (auteur,and(personne,some(aEcrit,livre))),
+      (editeur,and(personne,and(not(some(aEcrit,livre)),some(aEdite,livre)))),
+      (parent,and(personne,some(aEnfant,anything)))]).
+
+abox([(michelAnge,personne),
+      (david,sculpture),
+      (sonnets,livre),
+      (vinci,personne),
+      (joconde,objet)]).
+
+assert_role([(michelAnge, david, aCree),
+             (michelAnge, sonnets, aEcrit),
+             (vinci, joconde, aCree)]).
