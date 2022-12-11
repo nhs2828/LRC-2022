@@ -137,7 +137,7 @@ est_type_2(subs(and(C1,C2),anthing)):-concept_na_a(C1), concept_na_a(C2).
 
 %acquisition_prop_type2
 acquisition_prop_type2([],[],_).
-acquisition_prop_type2([subs(and(C1,C2),anything)|Abi],[some(inst,Y)|Abi1],Tbox):-concept_na_a(C1), concept_na_a(C2),traitement_Abox_unite(and(C1,C2),Y,Tbox), acquisition_prop_type2(Abi,Abi1,Tbox).
+acquisition_prop_type2([subs(and(C1,C2),anything)|Abi],[(inst,Y)|Abi1],Tbox):-concept_na_a(C1), concept_na_a(C2),traitement_Abox_unite(and(C1,C2),Y,Tbox), acquisition_prop_type2(Abi,Abi1,Tbox).
 acquisition_prop_type2([X|Abi],[X|Abi1],Tbox):-not(est_type_2(X)), acquisition_prop_type2(Abi,Abi1,Tbox).
 
 %premiere_etape
