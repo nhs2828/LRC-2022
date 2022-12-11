@@ -133,11 +133,11 @@ acquisition_prop_type1([(A,C)|Abi],[(A,Y)|Abi1],Tbox):-est_type_1((A,C)), traite
 acquisition_prop_type1([X|Abi],[X|Abi1],Tbox):-not(est_type_1(X)), acquisition_prop_type1(Abi,Abi1,Tbox).
 
 %est_type_2
-est_type_2(subs(and(C1,C2),anthing)):-concept_na_a(C1), concept_na_a(C2).
+est_type_2(and(C1,C2)):-concept_na_a(C1), concept_na_a(C2).
 
 %acquisition_prop_type2
 acquisition_prop_type2([],[],_).
-acquisition_prop_type2([subs(and(C1,C2),anything)|Abi],[(inst,Y)|Abi1],Tbox):-concept_na_a(C1), concept_na_a(C2),traitement_Abox_unite(and(C1,C2),Y,Tbox), acquisition_prop_type2(Abi,Abi1,Tbox).
+acquisition_prop_type2([X|Abi],[(inst,Y)|Abi1],Tbox):-est_type_2(X),traitement_Abox_concept_unite(X,Y,Tbox), acquisition_prop_type2(Abi,Abi1,Tbox).
 acquisition_prop_type2([X|Abi],[X|Abi1],Tbox):-not(est_type_2(X)), acquisition_prop_type2(Abi,Abi1,Tbox).
 
 %premiere_etape
@@ -145,9 +145,64 @@ premiere_etape(Tbox, Abi, Abr):-traitement_Tbox(Tbox), traitement_Abox(Abi, Abr)
 
 %tri_Abox
 tri_Abox([],_,_,_,_,_).
-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls):-
+tri_Abox([(I,some(R,C))|Abi],[(I,some(R,C))|Lie],Lpt,Li,Lu,Ls):-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls).
+tri_Abox([(I,all(R,C))|Abi],Lie,[(I,all(R,C))|Lpt],Li,Lu,Ls):-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls).
+tri_Abox([(I,and(C1,C2))|Abi],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls).
+tri_Abox([(I,or(C1,C2))|Abi],Lie,Lpt,Li,[(I,or(C1,C2))|Lu],Ls):-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls).
+tri_Abox([(I,C)|Abi],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-testcnamea(C), tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls).
+tri_Abox([(I,not(C))|Abi],Lie,Lpt,Li,Lu,[(I,not(C))|Ls]):-testcnamea(C), tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls).
 
-                           
+%genere
+genere(Nom) :- compteur(V),nombre(V,L1),concat([105,110,115,116],L1,L2),
+V1 is V+1,
+dynamic(compteur/1),
+retract(compteur(V)),
+dynamic(compteur/1),
+assert(compteur(V1)),nl,nl,nl,
+name(Nom,L2).
+nombre(0,[]).
+nombre(X,L1) :-R is (X mod 10),
+ Q is ((X-R)//10),
+ chiffre_car(R,R1),
+ char_code(R1,R2),
+ nombre(Q,L),
+ concat(L,[R2],L1).
+chiffre_car(0,'0').
+chiffre_car(1,'1').
+chiffre_car(2,'2').
+chiffre_car(3,'3').
+chiffre_car(4,'4').
+chiffre_car(5,'5').
+chiffre_car(6,'6').
+chiffre_car(7,'7').
+chiffre_car(8,'8').
+chiffre_car(9,'9').
+
+%chercher_Abox_role
+chercher_Abox_role(_,_,_,[]).
+chercher_Abox_role(A,R,[B|L],[(A,B,R)|Abr]):-chercher_Abox_role(A,R,L,Abr).
+chercher_Abox_role(A,R,L,[(A1,_,R1)|Abr]):-(A\=A1;R\=R1),chercher_Abox_role(A,R,L,Abr).
+%ajouter_deduction_all
+ajouter_deduction_all([],_,_).
+ajouter_deduction_all([B|ListeB],C,[(B,C)|Ls]):-ajouter_deduction_all(ListeB,C,Ls).
+
+
+%complete_some
+complete_some([],_,_,_,_,_).
+complete_some([(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr):-genere(B),complete_some(Lie,Lpt,Li,Lu,[(B,C)|Ls],[(I,B,R)|Abr]).
+
+%transformation_and
+transformation_and(_,_,[],_,_,_).
+transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr):-concat([(I,C1),(I,C2)],Ls,NewLs),transformation_and(Lie,Lpt,Li,Lu,NewLs,Abr).
+
+%deduction_all
+deduction_all(_,[],_,_,_,_).
+deduction_all(Lie,[(I,all(R,C))|Lpt],Li,Lu,Ls,Abr):-chercher_Abox_role(I,R,ListeB,Abr),ajouter_deduction_all(ListeB,C,L),concat(L,Ls,NewLs),deduction_all(Lie,Lpt,Li,Lu,NewLs,Abr).
+
+%transformation_or
+transformation_or(_,_,_,[],_,_).
+transformation_or(Lie,Lpt,Li,[(I,or(C1,C2))|Lu],Ls,Abr):-transformation_or(Lie,Lpt,Li,Lu,[(I,C1)|Ls],Abr);transformation_or(Lie,Lpt,Li,Lu,[(I,C2)|Ls],Abr).
+
                                          
                                          
                                          
