@@ -41,10 +41,8 @@ autoref(X,all(_,A),_,Lbase) :- autoref(X,A,Lbase,Lbase).
 % Remplacer Tbox
 remplacerTbox(X,X,_) :- concept(X).
 remplacerTbox(X,Y,[(X,Y)|_]).
-remplacerTbox(X,Y,[(A,_)|LTbox]) :- 
-  X\=A, remplacerTbox(X,Y,LTbox).
-remplacerTbox(not(X),not(Y),LTbox) :- 
-  remplacerTbox(X,Y,LTbox).
+remplacerTbox(X,Y,[(A,_)|LTbox]) :- X\=A, remplacerTbox(X,Y,LTbox).
+remplacerTbox(not(X),not(Y),LTbox) :- remplacerTbox(X,Y,LTbox).
 remplacerTbox(and(X1,X2),and(Y1,Y2),LTbox) :- 
   remplacerTbox(X1,Y1,LTbox),remplacerTbox(X2,Y2,LTbox),!.
 remplacerTbox(or(X1,X2),or(Y1,Y2),LTbox) :- 
