@@ -64,38 +64,38 @@ testcnamena(X):- setof(Y, cnamena(Y), L), member(X,L).
 testiname(X):- setof(Y, iname(Y), L), member(X,L).
 testrname(X):- setof(Y, rname(Y), L), member(X,L).
 %Concept
-concept(X):- testcnamea(X).
-concept(not(X)):- concept(X).
-concept(and(X,Y)):- concept(X), concept(Y).
-concept(or(X,Y)):- concept(X), concept(Y).
-concept(some(R,X)):- testrname(R), concept(X).
-concept(all(R,X)):- testrname(R), concept(X).
+concept_a(X):- testcnamea(X).
+concept_a(not(X)):- concept_a(X),!.
+concept_a(and(X,Y)):- concept_a(X), concept_a(Y),!.
+concept_a(or(X,Y)):- concept_a(X), concept_a(Y),!.
+concept_a(some(R,X)):- testrname(R), concept_a(X),!.
+concept_a(all(R,X)):- testrname(R), concept_a(X),!.
 
 %concept_na_a
-concept_na_a(X):- testcnamea(X).
-concept_na_a(X):- testcnamena(X).
-concept_na_a(not(X)):- concept_na_a(X).
-concept_na_a(and(X,Y)):- concept_na_a(X), concept_na_a(Y).
-concept_na_a(or(X,Y)):- concept_na_a(X), concept_na_a(Y).
-concept_na_a(some(R,X)):- testrname(R), concept_na_a(X).
-concept_na_a(all(R,X)):- testrname(R), concept_na_a(X).
+concept(X):- testcnamea(X).
+concept(X):- testcnamena(X).
+concept(not(X)):- concept(X),!.
+concept(and(X,Y)):- concept(X), concept(Y),!.
+concept(or(X,Y)):- concept(X), concept(Y),!.
+concept(some(R,X)):- testrname(R), concept(X),!.
+concept(all(R,X)):- testrname(R), concept(X),!.
 
 %Autoref
 autoref(X,X,_,_).
-autoref(X,A,[(X,_)|L],Lbase):- autoref(X,A,L,Lbase).
-autoref(X,A,[(Y,_)|L],Lbase):- testcnamena(A), Y \= A,autoref(X,A,L,Lbase).
-autoref(X,A,[(A,Y)|_],Lbase):- testcnamena(A), autoref(X,Y,Lbase,Lbase).
-autoref(X,not(A),_,Lbase):- autoref(X,A,Lbase,Lbase).
-autoref(X,and(A,B),_,Lbase):-autoref(X,A,Lbase,Lbase); autoref(X,B,Lbase,Lbase).
-autoref(X,or(A,B),_,Lbase):- autoref(X,A,Lbase,Lbase); autoref(X,B,Lbase,Lbase).
-autoref(X,some(_,A),_,Lbase):- autoref(X,A,Lbase,Lbase).
-autoref(X,all(_,A),_,Lbase):- autoref(X,A,Lbase,Lbase).
+autoref(X,A,[(X,_)|L],Lbase):- autoref(X,A,L,Lbase),!.
+autoref(X,A,[(Y,_)|L],Lbase):- testcnamena(A), Y \= A,autoref(X,A,L,Lbase),!.
+autoref(X,A,[(A,Y)|_],Lbase):- testcnamena(A), autoref(X,Y,Lbase,Lbase),!.
+autoref(X,not(A),_,Lbase):- autoref(X,A,Lbase,Lbase),!.
+autoref(X,and(A,B),_,Lbase):-autoref(X,A,Lbase,Lbase); autoref(X,B,Lbase,Lbase),!.
+autoref(X,or(A,B),_,Lbase):- autoref(X,A,Lbase,Lbase); autoref(X,B,Lbase,Lbase),!.
+autoref(X,some(_,A),_,Lbase):- autoref(X,A,Lbase,Lbase),!.
+autoref(X,all(_,A),_,Lbase):- autoref(X,A,Lbase,Lbase),!.
 
 %remplacer Tbox
-remplacerTbox(X,X,_):-concept(X).
+remplacerTbox(X,X,_):-concept_a(X).
 remplacerTbox(X,Y,[(X,Y)|_]).
-remplacerTbox(X,Y,[(A,_)|LTbox]):- X\=A, remplacerTbox(X,Y,LTbox).
-remplacerTbox(not(X),not(Y),LTbox):-remplacerTbox(X,Y,LTbox).
+remplacerTbox(X,Y,[(A,_)|LTbox]):- X\=A, remplacerTbox(X,Y,LTbox),!.
+remplacerTbox(not(X),not(Y),LTbox):-remplacerTbox(X,Y,LTbox),!.
 remplacerTbox(and(X1,X2),and(Y1,Y2),LTbox):-remplacerTbox(X1,Y1,LTbox),remplacerTbox(X2,Y2,LTbox),!.
 remplacerTbox(or(X1,X2),or(Y1,Y2),LTbox):-remplacerTbox(X1,Y1,LTbox),remplacerTbox(X2,Y2,LTbox),!.
 remplacerTbox(some(R,X),some(R,Y),LTbox):-remplacerTbox(X,Y,LTbox),!.
@@ -103,7 +103,7 @@ remplacerTbox(all(R,X),all(R,Y),LTbox):-remplacerTbox(X,Y,LTbox),!.
 
 %traitement Tbox
 traitement_Tbox_unite(X,Y,[(_,B)|LTBOX]):- X\=B, traitement_Tbox_unite(X,Y,LTBOX).
-traitement_Tbox_unite(X,Y,[(A,X)|_]):- concept(X), equiv(A,X), nnf(X,Y).
+traitement_Tbox_unite(X,Y,[(A,X)|_]):- concept_a(X), equiv(A,X), nnf(X,Y).
 
 traitement_Tbox_entiere([],[],_).
 traitement_Tbox_entiere([(A,X)|L1],[(A,Y)|L2],LTBOX):-traitement_Tbox_unite(X, Y,LTBOX) , traitement_Tbox_entiere(L1,L2, LTBOX).
@@ -111,8 +111,8 @@ traitement_Tbox_entiere([(A,X)|L1],[(A,Y)|L2],LTBOX):-traitement_Tbox_unite(X, Y
 traitement_Tbox(Tbox):- tbox(X), traitement_Tbox_entiere(X, Tbox, X).
 
 %traitement Abox_concept
-traitement_Abox_concept_unite(X,Y,_):- concept(X), nnf(X,Y).
-traitement_Abox_concept_unite(X,Y,LTbox):- concept_na_a(X), remplacerTbox(X,Y1,LTbox), nnf(Y1,Y).
+traitement_Abox_concept_unite(X,Y,_):- concept_a(X), nnf(X,Y).
+traitement_Abox_concept_unite(X,Y,LTbox):- concept(X), remplacerTbox(X,Y1,LTbox), nnf(Y1,Y).
 
 traitement_Abox_concept_entiere([], [], _).
 traitement_Abox_concept_entiere([(A,X)|L1],[(A,Y)|L2],LTBOX):-testiname(A), traitement_Abox_concept_unite(X, Y,LTBOX) , traitement_Abox_concept_entiere(L1,L2, LTBOX).
@@ -125,34 +125,59 @@ traitement_Abox_role([(A, B, R)|L]):-testiname(A), testiname(B),testrname(R), tr
 traitement_Abox(LC, LR):-abox(X), tbox(Y),assert_role(Z), traitement_Abox_concept_entiere(X, LC, Y), traitement_Abox_role(Z), concat([],Z,LR).
 
 %est_type_1
-est_type_1((A,X)):- iname(A), concept_na_a(X).
+est_type_1((A,X)):- iname(A), concept(X).
 
 %acquisition_prop_type1
 acquisition_prop_type1([],[],_).
-acquisition_prop_type1([(A,C)|Abi],[(A,Y)|Abi1],Tbox):-est_type_1((A,C)), traitement_Abox_concept_unite(not(C),Y,Tbox), acquisition_prop_type1(Abi,Abi1,Tbox).
-acquisition_prop_type1([X|Abi],[X|Abi1],Tbox):-not(est_type_1(X)), acquisition_prop_type1(Abi,Abi1,Tbox).
+acquisition_prop_type1([(A,C)|Abi],[(A,Y)|Abi1],Tbox):-est_type_1((A,C)), traitement_Abox_concept_unite(not(C),Y,Tbox), acquisition_prop_type1(Abi,Abi1,Tbox),!.
+acquisition_prop_type1([X|Abi],[X|Abi1],Tbox):-not(est_type_1(X)), acquisition_prop_type1(Abi,Abi1,Tbox),!.
 
 %est_type_2
-est_type_2(and(C1,C2)):-concept_na_a(C1), concept_na_a(C2).
+est_type_2(and(C1,C2)):-concept(C1), concept(C2).
 
 %acquisition_prop_type2
 acquisition_prop_type2([],[],_).
-acquisition_prop_type2([X|Abi],[(inst,Y)|Abi1],Tbox):-est_type_2(X),traitement_Abox_concept_unite(X,Y,Tbox), acquisition_prop_type2(Abi,Abi1,Tbox).
-acquisition_prop_type2([X|Abi],[X|Abi1],Tbox):-not(est_type_2(X)), acquisition_prop_type2(Abi,Abi1,Tbox).
+acquisition_prop_type2([X|Abi],[(inst,Y)|Abi1],Tbox):-est_type_2(X),traitement_Abox_concept_unite(X,Y,Tbox), acquisition_prop_type2(Abi,Abi1,Tbox),!.
+acquisition_prop_type2([X|Abi],[X|Abi1],Tbox):-not(est_type_2(X)), acquisition_prop_type2(Abi,Abi1,Tbox),!.
 
 %premiere_etape
 premiere_etape(Tbox, Abi, Abr):-traitement_Tbox(Tbox), traitement_Abox(Abi, Abr).
+%deuxiem_etape
+deuxieme_etape(Abi,Abi1,Tbox) :-
+                saisie_et_traitement_prop_a_demontrer(Abi,Abi1,Tbox).
+%programme
+programme :-
+             premiere_etape(Tbox,Abi,Abr),
+             deuxieme_etape(Abi,Abi1,Tbox),
+             troisieme_etape(Abi1,Abr).
+%troisieme_etape
+troisieme_etape(Abi,Abr) :-
+                            tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
+                            resolution(Lie,Lpt,Li,Lu,Ls,Abr),
+                            nl,write('Youpiiiiii, on a demontre la
+                            proposition initiale !!!').
 
+saisie_et_traitement_prop_a_demontrer(Abi,Abi1,Tbox) :-
+nl,write('Entrez le numero du type de proposition que vous voulez demontrer :'),nl,
+write('1 Une instance donnee appartient a un concept donne.'),nl, write('2 Deux concepts n"ont pas d"elements en commun(ils ont une intersection vide).'),nl, read(R), suite(R,Abi,Abi1,Tbox).
+suite(1,Abi,Abi1,Tbox) :-
+    acquisition_prop_type1(Abi,Abi1,Tbox),!.
+suite(2,Abi,Abi1,Tbox) :-
+    acquisition_prop_type2(Abi,Abi1,Tbox),!.
+suite(R,Abi,Abi1,Tbox) :-R\=1, R\=2,nl,write('Cette reponse est incorrecte.'),nl,
+    saisie_et_traitement_prop_a_demontrer(Abi,Abi1,Tbox).
+                                                                 
 %tri_Abox
 tri_Abox([],_,_,_,_,_).
-tri_Abox([(I,some(R,C))|Abi],[(I,some(R,C))|Lie],Lpt,Li,Lu,Ls):-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls).
-tri_Abox([(I,all(R,C))|Abi],Lie,[(I,all(R,C))|Lpt],Li,Lu,Ls):-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls).
-tri_Abox([(I,and(C1,C2))|Abi],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls).
-tri_Abox([(I,or(C1,C2))|Abi],Lie,Lpt,Li,[(I,or(C1,C2))|Lu],Ls):-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls).
-tri_Abox([(I,C)|Abi],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-testcnamea(C), tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls).
-tri_Abox([(I,not(C))|Abi],Lie,Lpt,Li,Lu,[(I,not(C))|Ls]):-testcnamea(C), tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls).
+tri_Abox([(I,some(R,C))|Abi],[(I,some(R,C))|Lie],Lpt,Li,Lu,Ls):-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),!.
+tri_Abox([(I,all(R,C))|Abi],Lie,[(I,all(R,C))|Lpt],Li,Lu,Ls):-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),!.
+tri_Abox([(I,and(C1,C2))|Abi],Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls):-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),!.
+tri_Abox([(I,or(C1,C2))|Abi],Lie,Lpt,Li,[(I,or(C1,C2))|Lu],Ls):-tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),!.
+tri_Abox([(I,C)|Abi],Lie,Lpt,Li,Lu,[(I,C)|Ls]):-testcnamea(C), tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),!.
+tri_Abox([(I,not(C))|Abi],Lie,Lpt,Li,Lu,[(I,not(C))|Ls]):-testcnamea(C), tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),!.
 
 %genere
+compteur(1).
 genere(Nom) :- compteur(V),nombre(V,L1),concat([105,110,115,116],L1,L2),
 V1 is V+1,
 dynamic(compteur/1),
@@ -189,20 +214,39 @@ ajouter_deduction_all([B|ListeB],C,[(B,C)|Ls]):-ajouter_deduction_all(ListeB,C,L
 
 %complete_some
 complete_some([],_,_,_,_,_).
-complete_some([(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr):-genere(B),complete_some(Lie,Lpt,Li,Lu,[(B,C)|Ls],[(I,B,R)|Abr]).
+complete_some([(I,some(R,C))|Lie],Lpt,Li,Lu,[(B,C)|Ls],[(I,B,R)|Abr]):-genere(B),complete_some(Lie,Lpt,Li,Lu,Ls,Abr),!.
 
 %transformation_and
 transformation_and(_,_,[],_,_,_).
-transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr):-concat([(I,C1),(I,C2)],Ls,NewLs),transformation_and(Lie,Lpt,Li,Lu,NewLs,Abr).
+transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,[(I,C1),(I,C2)|Ls],Abr):-transformation_and(Lie,Lpt,Li,Lu,Ls,Abr),!.
 
 %deduction_all
 deduction_all(_,[],_,_,_,_).
-deduction_all(Lie,[(I,all(R,C))|Lpt],Li,Lu,Ls,Abr):-chercher_Abox_role(I,R,ListeB,Abr),ajouter_deduction_all(ListeB,C,L),concat(L,Ls,NewLs),deduction_all(Lie,Lpt,Li,Lu,NewLs,Abr).
+deduction_all(Lie,[(I,all(R,C))|Lpt],Li,Lu,[L|Ls],Abr):-chercher_Abox_role(I,R,ListeB,Abr),ajouter_deduction_all(ListeB,C,L),deduction_all(Lie,Lpt,Li,Lu,Ls,Abr),!.
 
 %transformation_or
 transformation_or(_,_,_,[],_,_).
-transformation_or(Lie,Lpt,Li,[(I,or(C1,C2))|Lu],Ls,Abr):-transformation_or(Lie,Lpt,Li,Lu,[(I,C1)|Ls],Abr);transformation_or(Lie,Lpt,Li,Lu,[(I,C2)|Ls],Abr).
+transformation_or(Lie,Lpt,Li,[(I,or(C1,_))|Lu],[(I,C1)|Ls],Abr):-transformation_or(Lie,Lpt,Li,Lu,Ls,Abr).
+transformation_or(Lie,Lpt,Li,[(I,or(_,C2))|Lu],[(I,C2)|Ls],Abr):-transformation_or(Lie,Lpt,Li,Lu,Ls,Abr),!.
 
-                                         
-                                         
+%test_clash_unite
+test_clash_unite((I,C),[(I,not(C))|_]):-!.
+test_clash_unite((I,not(C)),[(I,C)|_]):-!.
+test_clash_unite((I,C),[(I1,X)|Li]):- (I\=I1;(C\=not(X);X\=not(C))),test_clash_unite((I,C),Li),!.
+
+%test_no_clash
+test_no_clash([],_).
+test_no_clash([X|L], Ls):- not(test_clash_unite(X,Ls)), test_no_clash(L,Ls),!.
+
+%resolution
+resolution(Lie,Lpt,Li,Lu,Ls,Abr):-complete_some(Lie,Lpt,Li,Lu,Ls,Abr).
+
+%evolue
+evolue([], _, _, _, _, _, _, _, _, _, _).
+evolue((I,some(R,C)),Lie,_,_,_,_,[(I,some(R,C))|Lie], _, _, _, _).
+evolue((I,all(R,C)),_,Lpt,_,_,_,_, [(I,all(R,C))|Lpt], _, _, _).
+evolue((I,and(C1,C2)),_,_,Li,_,_,_, _, [(I,and(C1,C2))|Li], _, _).
+evolue((I,or(C1,C2)),_,_,_,Lu,_,_, _, _, [(I,or(C1,C2))|Lu], _).
+evolue((I,C),_,_,_,_,Ls,_, _, _, _, [(I,C)|Ls]):-testcnamea(C).
+evolue((I,not(C)),_,_,_,_,Ls,_, _, _, _, [(I,not(C))|Ls]):-testcnamea(C).
                                          
