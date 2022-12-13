@@ -49,14 +49,9 @@ inst(joconde,objet).
 instR(michelAnge, david, aCree).
 instR(michelAnge, sonnets, aEcrit).
 instR(vinci, joconde, aCree).
-tbox([(sculpteur,and(personne,some(aCree,sculpture))),
-(auteur,and(personne,some(aEcrit,livre))),
-(editeur,and(personne,and(not(some(aEcrit,livre)),some(aEdite,livre)))),
-(parent,and(personne,some(aEnfant,anything)))]).
-abox([(michelAnge,personne), (david,sculpture), (sonnets,livre),
-(vinci,personne), (joconde,objet)]).
-assert_role([(michelAnge, david, aCree), (michelAnge, sonnets, aEcrit),(vinci,
-joconde, aCree)]).
+tBox(Tbox) :- setof((X, Y), equiv(X, Y), Tbox).
+aBox(Abi) :- setof((X, Y), inst(X, Y), Abi).
+assert_Role(Abr) :- setof((X, Y, Z), instR(X, Y, Z), Abr).
 
 %Correction sémantique
 testcnamea(X):- setof(Y, cnamea(Y), L), member(X,L).
@@ -102,43 +97,41 @@ remplacerTbox(some(R,X),some(R,Y),LTbox):-remplacerTbox(X,Y,LTbox),!.
 remplacerTbox(all(R,X),all(R,Y),LTbox):-remplacerTbox(X,Y,LTbox),!.
 
 %traitement Tbox
-traitement_Tbox_unite(X,Y,[(_,B)|LTBOX]):- X\=B, traitement_Tbox_unite(X,Y,LTBOX).
-traitement_Tbox_unite(X,Y,[(A,X)|_]):- concept_a(X), equiv(A,X), nnf(X,Y).
+traitement_Tbox_unite(X,Y,[(_,B)|LTBOX]):- X\=B, traitement_Tbox_unite(X,Y,LTBOX),!.
+traitement_Tbox_unite(X,Y,[(A,X)|_]):- concept_a(X), equiv(A,X), nnf(X,Y),!.
 
 traitement_Tbox_entiere([],[],_).
-traitement_Tbox_entiere([(A,X)|L1],[(A,Y)|L2],LTBOX):-traitement_Tbox_unite(X, Y,LTBOX) , traitement_Tbox_entiere(L1,L2, LTBOX).
+traitement_Tbox_entiere([(A,X)|L1],[(A,Y)|L2],LTBOX):-traitement_Tbox_unite(X, Y,LTBOX) , traitement_Tbox_entiere(L1,L2, LTBOX),!.
 
-traitement_Tbox(Tbox):- tbox(X), traitement_Tbox_entiere(X, Tbox, X).
+traitement_Tbox(Tbox):- tBox(X), traitement_Tbox_entiere(X, Tbox, X).
 
 %traitement Abox_concept
 traitement_Abox_concept_unite(X,Y,_):- concept_a(X), nnf(X,Y).
-traitement_Abox_concept_unite(X,Y,LTbox):- concept(X), remplacerTbox(X,Y1,LTbox), nnf(Y1,Y).
+traitement_Abox_concept_unite(X,Y,LTbox):- concept(X), remplacerTbox(X,Y1,LTbox), nnf(Y1,Y),!.
 
 traitement_Abox_concept_entiere([], [], _).
-traitement_Abox_concept_entiere([(A,X)|L1],[(A,Y)|L2],LTBOX):-testiname(A), traitement_Abox_concept_unite(X, Y,LTBOX) , traitement_Abox_concept_entiere(L1,L2, LTBOX).
+traitement_Abox_concept_entiere([(A,X)|L1],[(A,Y)|L2],LTBOX):-testiname(A), traitement_Abox_concept_unite(X, Y,LTBOX) , traitement_Abox_concept_entiere(L1,L2, LTBOX),!.
 
 %traitement Abox_role
 traitement_Abox_role([]).
-traitement_Abox_role([(A, B, R)|L]):-testiname(A), testiname(B),testrname(R), traitement_Abox_role(L).
+traitement_Abox_role([(A, B, R)|L]):-testiname(A), testiname(B),testrname(R), traitement_Abox_role(L),!.
 
 %traitement Abox
-traitement_Abox(LC, LR):-abox(X), tbox(Y),assert_role(Z), traitement_Abox_concept_entiere(X, LC, Y), traitement_Abox_role(Z), concat([],Z,LR).
+traitement_Abox(LC, LR):-aBox(X), tBox(Y),assert_Role(Z), traitement_Abox_concept_entiere(X, LC, Y), traitement_Abox_role(Z), concat([],Z,LR),!.
 
 %est_type_1
 est_type_1((A,X)):- iname(A), concept(X).
 
 %acquisition_prop_type1
-acquisition_prop_type1([],[],_).
-acquisition_prop_type1([(A,C)|Abi],[(A,Y)|Abi1],Tbox):-est_type_1((A,C)), traitement_Abox_concept_unite(not(C),Y,Tbox), acquisition_prop_type1(Abi,Abi1,Tbox),!.
-acquisition_prop_type1([X|Abi],[X|Abi1],Tbox):-not(est_type_1(X)), acquisition_prop_type1(Abi,Abi1,Tbox),!.
+acquisition_prop_type1(Abi,[(A,Y)|Abi],Tbox):-nl,write("entrez I."),nl,read(A),nl,write("Entrez C"),nl,read(C),
+    		est_type_1((A,C)), traitement_Abox_concept_unite(not(C),Y,Tbox),!.
 
 %est_type_2
 est_type_2(and(C1,C2)):-concept(C1), concept(C2).
 
 %acquisition_prop_type2
-acquisition_prop_type2([],[],_).
-acquisition_prop_type2([X|Abi],[(inst,Y)|Abi1],Tbox):-est_type_2(X),traitement_Abox_concept_unite(X,Y,Tbox), acquisition_prop_type2(Abi,Abi1,Tbox),!.
-acquisition_prop_type2([X|Abi],[X|Abi1],Tbox):-not(est_type_2(X)), acquisition_prop_type2(Abi,Abi1,Tbox),!.
+acquisition_prop_type2(Abi,[(B,Y)|Abi],Tbox):-nl,write("entrez C1."),nl,read(C1),nl,write("Entrez C2"),nl,read(C2),
+    est_type_2(and(C1,C2)),genere(B), traitement_Abox_concept_unite(and(C1,C2),Y,Tbox),!.
 
 %premiere_etape
 premiere_etape(Tbox, Abi, Abr):-traitement_Tbox(Tbox), traitement_Abox(Abi, Abr).
@@ -151,6 +144,8 @@ programme :-
              deuxieme_etape(Abi,Abi1,Tbox),
              troisieme_etape(Abi1,Abr).
 %troisieme_etape
+
+
 troisieme_etape(Abi,Abr) :-
                             tri_Abox(Abi,Lie,Lpt,Li,Lu,Ls),
                             resolution(Lie,Lpt,Li,Lu,Ls,Abr),
@@ -222,7 +217,7 @@ transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,[(I,C1),(I,C2)|Ls],Abr):-trans
 
 %deduction_all
 deduction_all(_,[],_,_,_,_).
-deduction_all(Lie,[(I,all(R,C))|Lpt],Li,Lu,[L|Ls],Abr):-chercher_Abox_role(I,R,ListeB,Abr),ajouter_deduction_all(ListeB,C,L),deduction_all(Lie,Lpt,Li,Lu,Ls,Abr),!.
+deduction_all(Lie,[(I,all(R,C))|Lpt],Li,Lu,Ls,Abr):-chercher_Abox_role(I,R,ListeB,Abr),ajouter_deduction_all(ListeB,C,Ls),deduction_all(Lie,Lpt,Li,Lu,Ls,Abr),!.
 
 %transformation_or
 transformation_or(_,_,_,[],_,_).
@@ -238,8 +233,48 @@ test_clash_unite((I,C),[(I1,X)|Li]):- (I\=I1;(C\=not(X);X\=not(C))),test_clash_u
 test_no_clash([],_).
 test_no_clash([X|L], Ls):- not(test_clash_unite(X,Ls)), test_no_clash(L,Ls),!.
 
+%maj_Lie
+maj_Lie([],_).
+maj_Lie([(I,some(R,C))|L1],[(I,some(R,C))|Lres]):-maj_Lie(L1,Lres),!.
+maj_Lie([(_,all(_,_))|L1],Lres):-maj_Lie(L1,Lres),!.
+maj_Lie([(_,and(_,_))|L1],Lres):-maj_Lie(L1,Lres),!.
+maj_Lie([(_,or(_,_))|L1],Lres):-maj_Lie(L1,Lres),!.
+maj_Lie([(_,_)|L1],Lres):-maj_Lie(L1,Lres),!.
+maj_Lie([(_,not(_))|L1],Lres):-maj_Lie(L1,Lres),!.
+
+%maj_Lpt
+maj_Lpt([],_).
+maj_Lpt([(_,some(_,_))|L1],Lres):-maj_Lpt(L1,Lres),!.
+maj_Lpt([(I,all(R,C))|L1],[(I,all(R,C))|Lres]):-maj_Lpt(L1,Lres),!.
+maj_Lpt([(_,and(_,_))|L1],Lres):-maj_Lpt(L1,Lres),!.
+maj_Lpt([(_,or(_,_))|L1],Lres):-maj_Lpt(L1,Lres),!.
+maj_Lpt([(_,_)|L1],Lres):-maj_Lpt(L1,Lres),!.
+maj_Lpt([(_,not(_))|L1],Lres):-maj_Lpt(L1,Lres),!.
+
+%maj_Li
+maj_Li([],_).
+maj_Li([(_,some(_,_))|L1],Lres):-maj_Li(L1,Lres),!.
+maj_Li([(_,all(_,_))|L1],Lres):-maj_Li(L1,Lres),!.
+maj_Li([(I,and(C1,C2))|L1],[(I,and(C1,C2))|Lres]):-maj_Li(L1,Lres),!.
+maj_Li([(_,or(_,_))|L1],Lres):-maj_Li(L1,Lres),!.
+maj_Li([(_,_)|L1],Lres):-maj_Li(L1,Lres),!.
+maj_Li([(_,not(_))|L1],Lres):-maj_Li(L1,Lres),!.
+
+%maj_Lu
+maj_Lu([],_).
+maj_Lu([(_,some(_,_))|L1],Lres):-maj_Lu(L1,Lres),!.
+maj_Lu([(_,all(_,_))|L1],Lres):-maj_Lu(L1,Lres),!.
+maj_Lu([(_,and(_,_))|L1],[(_,and(_,_))|Lres]):-maj_Lu(L1,Lres),!.
+maj_Lu([(I,or(C1,C2))|L1],[(I,or(C1,C2))|Lres]):-maj_Lu(L1,Lres),!.
+maj_Lu([(_,_)|L1],Lres):-maj_Lu(L1,Lres),!.
+maj_Lu([(_,not(_))|L1],Lres):-maj_Lu(L1,Lres),!.
+
 %resolution
-resolution(Lie,Lpt,Li,Lu,Ls,Abr):-complete_some(Lie,Lpt,Li,Lu,Ls,Abr).
+resolution([],[],[],[],_,_).
+resolution(Lie,Lpt,Li,Lu,Ls,Abr):-complete_some(Lie,Lpt,Li,Lu,Ls_bis,Abr_bis), concat(Ls,Ls_bis,NewLs),concat(Abr,Abr_bis,NewAbr), test_no_clash(NewLs,NewLs),maj_Lie(NewLs,NewLie), resolution(NewLie,Lpt,Li,Lu,NewLs,NewAbr),!.
+resolution(Lie,Lpt,Li,Lu,Ls,Abr):-transformation_and(Lie,Lpt,Li,Lu,Ls_bis,Abr), concat(Ls,Ls_bis,NewLs), test_no_clash(NewLs,NewLs),maj_Li(NewLs,NewLi), resolution(Lie,Lpt,NewLi,Lu,NewLs,Abr),!.
+resolution(Lie,Lpt,Li,Lu,Ls,Abr):-deduction_all(Lie,Lpt,Li,Lu,Ls_bis,Abr), concat(Ls,Ls_bis,NewLs), test_no_clash(NewLs,NewLs), maj_Lpt(NewLs,NewLpt),resolution(Lie,NewLpt,Li,Lu,NewLs,Abr),!.
+resolution(Lie,Lpt,Li,Lu,Ls,Abr):-transformation_or(Lie,Lpt,Li,Lu,Ls_bis,Abr), concat(Ls,Ls_bis,NewLs), test_no_clash(NewLs,NewLs), maj_Lu(NewLs,NewLu),resolution(Lie,NewLu,Li,Lu,NewLs,Abr).
 
 %evolue
 evolue([], _, _, _, _, _, _, _, _, _, _).
