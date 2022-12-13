@@ -208,21 +208,17 @@ ajouter_deduction_all([B|ListeB],C,[(B,C)|Ls]):-ajouter_deduction_all(ListeB,C,L
 
 
 %complete_some
-complete_some([],_,_,_,_,_).
-complete_some([(I,some(R,C))|Lie],Lpt,Li,Lu,[(B,C)|Ls],[(I,B,R)|Abr]):-genere(B),complete_some(Lie,Lpt,Li,Lu,Ls,Abr),!.
+complete_some([(I,some(R,C))|_],_,_,_,[(B,C)|_],[(I,B,R)|_]):-genere(B).
 
 %transformation_and
-transformation_and(_,_,[],_,_,_).
-transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,[(I,C1),(I,C2)|Ls],Abr):-transformation_and(Lie,Lpt,Li,Lu,Ls,Abr),!.
+transformation_and(_,_,[(I,and(C1,C2))|_],_,[(I,C1),(I,C2)|_],_).
 
 %deduction_all
-deduction_all(_,[],_,_,_,_).
-deduction_all(Lie,[(I,all(R,C))|Lpt],Li,Lu,Ls,Abr):-chercher_Abox_role(I,R,ListeB,Abr),ajouter_deduction_all(ListeB,C,Ls),deduction_all(Lie,Lpt,Li,Lu,Ls,Abr),!.
+deduction_all(_,[(I,all(R,C))|_],_,_,Ls,Abr):-chercher_Abox_role(I,R,ListeB,Abr),ajouter_deduction_all(ListeB,C,Ls).
 
 %transformation_or
-transformation_or(_,_,_,[],_,_).
-transformation_or(Lie,Lpt,Li,[(I,or(C1,_))|Lu],[(I,C1)|Ls],Abr):-transformation_or(Lie,Lpt,Li,Lu,Ls,Abr).
-transformation_or(Lie,Lpt,Li,[(I,or(_,C2))|Lu],[(I,C2)|Ls],Abr):-transformation_or(Lie,Lpt,Li,Lu,Ls,Abr),!.
+transformation_or(_,_,_,[(I,or(C1,_))|_],[(I,C1)|_],_).
+transformation_or(_,_,_,[(I,or(_,C2))|_],[(I,C2)|_],_).
 
 %test_clash_unite
 test_clash_unite((I,C),[(I,not(C))|_]):-!.
@@ -233,48 +229,9 @@ test_clash_unite((I,C),[(I1,X)|Li]):- (I\=I1;(C\=not(X);X\=not(C))),test_clash_u
 test_no_clash([],_).
 test_no_clash([X|L], Ls):- not(test_clash_unite(X,Ls)), test_no_clash(L,Ls),!.
 
-%maj_Lie
-maj_Lie([],_).
-maj_Lie([(I,some(R,C))|L1],[(I,some(R,C))|Lres]):-maj_Lie(L1,Lres),!.
-maj_Lie([(_,all(_,_))|L1],Lres):-maj_Lie(L1,Lres),!.
-maj_Lie([(_,and(_,_))|L1],Lres):-maj_Lie(L1,Lres),!.
-maj_Lie([(_,or(_,_))|L1],Lres):-maj_Lie(L1,Lres),!.
-maj_Lie([(_,_)|L1],Lres):-maj_Lie(L1,Lres),!.
-maj_Lie([(_,not(_))|L1],Lres):-maj_Lie(L1,Lres),!.
-
-%maj_Lpt
-maj_Lpt([],_).
-maj_Lpt([(_,some(_,_))|L1],Lres):-maj_Lpt(L1,Lres),!.
-maj_Lpt([(I,all(R,C))|L1],[(I,all(R,C))|Lres]):-maj_Lpt(L1,Lres),!.
-maj_Lpt([(_,and(_,_))|L1],Lres):-maj_Lpt(L1,Lres),!.
-maj_Lpt([(_,or(_,_))|L1],Lres):-maj_Lpt(L1,Lres),!.
-maj_Lpt([(_,_)|L1],Lres):-maj_Lpt(L1,Lres),!.
-maj_Lpt([(_,not(_))|L1],Lres):-maj_Lpt(L1,Lres),!.
-
-%maj_Li
-maj_Li([],_).
-maj_Li([(_,some(_,_))|L1],Lres):-maj_Li(L1,Lres),!.
-maj_Li([(_,all(_,_))|L1],Lres):-maj_Li(L1,Lres),!.
-maj_Li([(I,and(C1,C2))|L1],[(I,and(C1,C2))|Lres]):-maj_Li(L1,Lres),!.
-maj_Li([(_,or(_,_))|L1],Lres):-maj_Li(L1,Lres),!.
-maj_Li([(_,_)|L1],Lres):-maj_Li(L1,Lres),!.
-maj_Li([(_,not(_))|L1],Lres):-maj_Li(L1,Lres),!.
-
-%maj_Lu
-maj_Lu([],_).
-maj_Lu([(_,some(_,_))|L1],Lres):-maj_Lu(L1,Lres),!.
-maj_Lu([(_,all(_,_))|L1],Lres):-maj_Lu(L1,Lres),!.
-maj_Lu([(_,and(_,_))|L1],[(_,and(_,_))|Lres]):-maj_Lu(L1,Lres),!.
-maj_Lu([(I,or(C1,C2))|L1],[(I,or(C1,C2))|Lres]):-maj_Lu(L1,Lres),!.
-maj_Lu([(_,_)|L1],Lres):-maj_Lu(L1,Lres),!.
-maj_Lu([(_,not(_))|L1],Lres):-maj_Lu(L1,Lres),!.
-
 %resolution
-resolution([],[],[],[],_,_).
-resolution(Lie,Lpt,Li,Lu,Ls,Abr):-complete_some(Lie,Lpt,Li,Lu,Ls_bis,Abr_bis), concat(Ls,Ls_bis,NewLs),concat(Abr,Abr_bis,NewAbr), test_no_clash(NewLs,NewLs),maj_Lie(NewLs,NewLie), resolution(NewLie,Lpt,Li,Lu,NewLs,NewAbr),!.
-resolution(Lie,Lpt,Li,Lu,Ls,Abr):-transformation_and(Lie,Lpt,Li,Lu,Ls_bis,Abr), concat(Ls,Ls_bis,NewLs), test_no_clash(NewLs,NewLs),maj_Li(NewLs,NewLi), resolution(Lie,Lpt,NewLi,Lu,NewLs,Abr),!.
-resolution(Lie,Lpt,Li,Lu,Ls,Abr):-deduction_all(Lie,Lpt,Li,Lu,Ls_bis,Abr), concat(Ls,Ls_bis,NewLs), test_no_clash(NewLs,NewLs), maj_Lpt(NewLs,NewLpt),resolution(Lie,NewLpt,Li,Lu,NewLs,Abr),!.
-resolution(Lie,Lpt,Li,Lu,Ls,Abr):-transformation_or(Lie,Lpt,Li,Lu,Ls_bis,Abr), concat(Ls,Ls_bis,NewLs), test_no_clash(NewLs,NewLs), maj_Lu(NewLs,NewLu),resolution(Lie,NewLu,Li,Lu,NewLs,Abr).
+resolution(Lie,Lpt,Li,Lu,Ls,Abr):-complete_some(Lie,Lpt,Li,Lu,Ls_bis,Abr_bis)
+
 
 %evolue
 evolue([], _, _, _, _, _, _, _, _, _, _).
