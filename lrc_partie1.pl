@@ -240,8 +240,8 @@ transformation_or(Lie,Lpt,Li,[(I,or(C1,C2))|Lu],Ls,Abr):-
     resolution(Lie1,Lpt1,Li1,Lu1,Ls1,Abr).
 
 %test_clash_unite
-test_clash_unite((I,C),[(I,not(C))|_]):-!.
-test_clash_unite((I,not(C)),[(I,C)|_]):-!.
+test_clash_unite((I,C),[(I,not(C))|Li]):-!.
+test_clash_unite((I,not(C)),[(I,C)|Li]):-!.
 test_clash_unite((I,C),[(I1,X)|Li]):- nnf(not(C),NewC),(I\=I1;NewC\=X),test_clash_unite((I,C),Li),!.
 
 %test_no_clash
@@ -250,17 +250,27 @@ test_no_clash([X|L], Ls):- not(test_clash_unite(X,Ls)), test_no_clash(L,Ls),!.
 
 
 %resolution
-resolution([],[],[],[],Ls,_):-not(test_no_clash(Ls,Ls)),!.
+resolution([],[],[],[],Ls,Abr):-not(test_no_clash(Ls,Ls)),!.
 resolution(Lie,Lpt,Li,Lu,Ls,Abr):-test_no_clash(Ls,Ls),complete_some(Lie,Lpt,Li,Lu,Ls,Abr).
 resolution([],Lpt,Li,Lu,Ls,Abr):-test_no_clash(Ls,Ls),transformation_and([],Lpt,Li,Lu,Ls,Abr).
-resolution([],Lpt,[],Lu,Ls,Abr):-test_no_clash(Ls,Ls),deduction_all([],Lpt,[],Lu,Ls,Abr).
+resolution([],Lpt,[],Lu,Ls,Abr):-test_no_clash(Ls,Ls),
+    deduction_all([],Lpt,[],Lu,Ls,Abr).
 resolution([],[],[],Lu,Ls,Abr):-test_no_clash(Ls,Ls),transformation_or([],[],[],Lu,Ls,Abr).
 
 %evolue
 evolue_pourtout([], _, _, _, _, _, _, _, _, _, _).
-evolue_pourtout([X|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1):-
-    evolue(X, Lie2, Lpt2, Li2, Lu2, Ls2, Lie1, Lpt1, Li1, Lu1, Ls1),
-    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie2, Lpt2, Li2, Lu2, Ls2),!.
+evolue_pourtout([(I,some(R,C))|L],Lie, Lpt, Li, Lu, Ls, [(I,some(R,C))|Lie], Lpt1, Li1, Lu1, Ls1):-
+    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie, Lpt1, Li1, Lu1, Ls1),!.
+evolue_pourtout([(I,all(R,C))|L],Lie, Lpt, Li, Lu, Ls, Lie1, [(I,all(R,C))|Lpt], Li1, Lu1, Ls1):-
+    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie1, Lpt, Li1, Lu1, Ls1),!.
+evolue_pourtout([(I,and(C1,C2))|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, [(I,and(C1,C2))|Li], Lu1, Ls1):-
+    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li, Lu1, Ls1),!.
+evolue_pourtout([(I,or(C1,C2))|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, [(I,or(C1,C2))|Lu], Ls1):-
+    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu, Ls1),!.
+evolue_pourtout([(I,C)|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, [(I,C)|Ls]):-
+    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls),!.
+evolue_pourtout([(I,not(C))|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, [(I,not(C))|Ls]):-
+    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls),!.
     
 evolue((I,some(R,C)),Lie,Lpt,Li,Lu,Ls,[(I,some(R,C))|Lie], Lpt, Li,Lu, Ls).
 evolue((I,all(R,C)),Lie,Lpt,Li,Lu,Ls,Lie, [(I,all(R,C))|Lpt], Li, Lu, Ls).
@@ -270,6 +280,9 @@ evolue((I,C),Lie,Lpt,Li,Lu,Ls,Lie, Lpt, Li, Lu, [(I,C)|Ls]):-testcnamea(C).
 evolue((I,not(C)),Lie,Lpt,Li,Lu,Ls,Lie, Lpt, Li, Lu, [(I,not(C))|Ls]):-testcnamea(C).
 
 %affiche
+affiche([]).
+
+affiche([X|L]) :- affiche(X), affiche(L).
 affiche((I,some(R,C))) :- 
     nl,affiche(I),write(': some.'), affiche(R), write('.'),affiche(C),!.
 
