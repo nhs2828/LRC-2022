@@ -117,7 +117,7 @@ traitement_Abox_role([(A, B, R)|L]):-testiname(A), testiname(B),testrname(R), tr
 traitement_Abox(LC, LR):-aBox(X), tBox(Y),assert_Role(Z), traitement_Abox_concept_entiere(X, LC, Y), traitement_Abox_role(Z), concat([],Z,LR),!.
 
 %est_type_1
-est_type_1((A,X)):- iname(A), concept(X).
+est_type_1((A,X)):- testiname(A), concept(X).
 
 %acquisition_prop_type1
 acquisition_prop_type1(Abi,[(A,Y)|Abi],Tbox):-nl,write("entrez I."),nl,read(A),nl,write("Entrez C"),nl,read(C),
