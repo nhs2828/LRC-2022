@@ -240,8 +240,10 @@ transformation_or(Lie,Lpt,Li,[(I,or(C1,C2))|Lu],Ls,Abr):-
     resolution(Lie1,Lpt1,Li1,Lu1,Ls1,Abr).
 
 %test_clash_unite
-test_clash_unite((I,C),[(I,not(C))|Li]):-!.
-test_clash_unite((I,not(C)),[(I,C)|Li]):-!.
+test_clash_unite((I,C),[(I,not(C))|_]):-nl,write('Clash trouve:'),nl,
+affiche((I,C)),nl,write('\tET\t'),affiche((I,not(C))),!.
+test_clash_unite((I,not(C)),[(I,C)|_]):-nl,write('Clash trouve:'),nl,
+affiche((I,not(C))),nl,write('\tET\t'),affiche((I,C)),!.
 test_clash_unite((I,C),[(I1,X)|Li]):- nnf(not(C),NewC),(I\=I1;NewC\=X),test_clash_unite((I,C),Li),!.
 
 %test_no_clash
@@ -250,7 +252,8 @@ test_no_clash([X|L], Ls):- not(test_clash_unite(X,Ls)), test_no_clash(L,Ls),!.
 
 
 %resolution
-resolution([],[],[],[],Ls,Abr):-not(test_no_clash(Ls,Ls)),!.
+resolution([],[],[],[],Ls,_):-nl,write('Fin resolution'),not(test_no_clash(Ls,Ls)),nl,
+write('Dans LS:'),affiche(Ls),!.
 resolution(Lie,Lpt,Li,Lu,Ls,Abr):-test_no_clash(Ls,Ls),complete_some(Lie,Lpt,Li,Lu,Ls,Abr).
 resolution([],Lpt,Li,Lu,Ls,Abr):-test_no_clash(Ls,Ls),transformation_and([],Lpt,Li,Lu,Ls,Abr).
 resolution([],Lpt,[],Lu,Ls,Abr):-test_no_clash(Ls,Ls),
