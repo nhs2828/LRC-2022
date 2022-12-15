@@ -52,9 +52,9 @@ assert_Role(Abr) :-
       setof((X, Y, Z), instR(X, Y, Z), Abr).
 
 /* % Chargement "manuel" de la TBox et de la ABox
-tbox([(sculpteur, and(personne, some(aCree, sculpture))),  (auteur, and(personne, some(aEcrit, livre))),  (editeur, and(personne, and(not(some(aEcrit, livre)), some(aEdite, livre)))),  (parent, and(personne, some(aEnfant, anything)))]).
+tBox([(sculpteur, and(personne, some(aCree, sculpture))),  (auteur, and(personne, some(aEcrit, livre))),  (editeur, and(personne, and(not(some(aEcrit, livre)), some(aEdite, livre)))),  (parent, and(personne, some(aEnfant, anything)))]).
 
-abox([(michelAnge, personne),  (david, sculpture),  (sonnets, livre),  (vinci, personne),  (joconde, objet)]).
+aBox([(michelAnge, personne),  (david, sculpture),  (sonnets, livre),  (vinci, personne),  (joconde, objet)]).
 
 assert_role([(michelAnge, david, aCree),  (michelAnge, sonnets, aEcrit),  (vinci, joconde, aCree)]).
 */
