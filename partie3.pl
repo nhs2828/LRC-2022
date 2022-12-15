@@ -40,8 +40,6 @@ remove_doublons(Ls, Lie, Lpt, Li, Lu, Ls1, Lie1, Lpt1, Li1, Lu1):-
 Règle ∃
 -----------------------------------------------------------*/
 complete_some([(I, some(R, C))|Lie], Lpt, Li, Lu, Ls, Abr) :-
-    nl,
-    write('SOMEEEEE !!'),
     genere(B),
     A=(B, C),
     evolue_pourtout([A], Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),
