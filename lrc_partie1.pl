@@ -200,14 +200,8 @@ remplacerTbox(all(R, X), all(R, Y), LTbox) :-
     !.
 
 %traitement Tbox
-traitement_Tbox_entiere([], []).
-traitement_Tbox_entiere([(A, X)|L1], [(A, Y)|L2]) :-
-    testcnamena(A),
-    concept(X),
-    equiv(A, X),
-    nnf(X, Y),
-    traitement_Tbox_entiere(L1, L2),
-    !.
+traitement_Tbox_entiere([],[]).
+traitement_Tbox_entiere([(A,X)|L1],[(A,Y)|L2]):-not(autoref(A,X,[(A,X)|L1],[(A,X)|L1])), testcnamena(A), concept(X), equiv(A,X), nnf(X,Y) , traitement_Tbox_entiere(L1,L2),!.
 
 traitement_Tbox(Tbox) :-
     tBox(X),
