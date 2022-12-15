@@ -28,7 +28,8 @@ nombre(X, L1) :-
     chiffre_car(R, R1),
     char_code(R1, R2),
     nombre(Q, L),
-    concat(L, [R2], L1).
+    concat(L, [R2], L1),
+    !.
 
 chiffre_car(0, '0').
 chiffre_car(1, '1').
