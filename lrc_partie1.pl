@@ -203,41 +203,49 @@ chercher_Abox_role(A,R,L,[(A1,_,R1)|Abr]):-(A\=A1;R\=R1),chercher_Abox_role(A,R,
 ajouter_deduction_all([],_,_).
 ajouter_deduction_all([B|ListeB],C,[(B,C)|Ls]):-ajouter_deduction_all(ListeB,C,Ls).
 
+%remove_doublons
+remove_doublons(Ls, Lie, Lpt, Li, Lu, Ls1, Lie1, Lpt1, Li1, Lu1):-
+sort(Ls,Ls1), sort(Lie,Lie1), sort(Lpt,Lpt1),sort(Li,Li1),sort(Lu,Lu1),!.
 
 %complete_some
 complete_some([(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr):-nl,write('SOMEEEEE !!'),genere(B),
     A=(B,C),
-    evolue(A, Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),
-    affiche_evolution_Abox(Ls, [(I,some(R,C))|Lie], Lpt, Li, Lu, Abr, Ls1, Lie1, Lpt1, Li1, Lu1, [(I,B,R)|Abr]),
-    resolution(Lie1,Lpt1,Li1,Lu1,Ls1,[(I,B,R)|Abr]).
+    evolue_pourtout([A], Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),
+    remove_doublons(Lie1, Lpt1, Li1, Lu1, Ls1,Lie2, Lpt2, Li2, Lu2, Ls2),
+    affiche_evolution_Abox(Ls, [(I,some(R,C))|Lie], Lpt, Li, Lu, Abr, Ls2, Lie2, Lpt2, Li2, Lu2, [(I,B,R)|Abr]),
+    resolution(Lie2,Lpt2,Li2,Lu2,Ls2,[(I,B,R)|Abr]).
     
 %transformation_and
 transformation_and(Lie,Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr):-
     A1=(I,C1),
-    evolue(A1, Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),
+    evolue_pourtout([A1], Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),
     A2=(I,C2),
-	evolue(A2, Lie1, Lpt1, Li1, Lu1, Ls1, Lie2, Lpt2, Li2, Lu2, Ls2),
-    affiche_evolution_Abox(Ls, Lie, Lpt, [(I,and(C1,C2))|Li], Lu, Abr, Ls2, Lie2, Lpt2, Li2, Lu2, Abr),
-    resolution(Lie2,Lpt2,Li2,Lu2,Ls2,Abr).
+	evolue_pourtout([A2], Lie1, Lpt1, Li1, Lu1, Ls1, Lie2, Lpt2, Li2, Lu2, Ls2),
+    remove_doublons(Lie2, Lpt2, Li2, Lu2, Ls2,Lie3, Lpt3, Li3, Lu3, Ls3),
+    affiche_evolution_Abox(Ls, Lie, Lpt, [(I,and(C1,C2))|Li], Lu, Abr, Ls3, Lie3, Lpt3, Li3, Lu3, Abr),
+    resolution(Lie3,Lpt3,Li3,Lu3,Ls3,Abr).
     
 %deduction_all
 deduction_all(Lie,[(I,all(R,C))|Lpt],Li,Lu,Ls,Abr):-chercher_Abox_role(I,R,ListeB,Abr),ajouter_deduction_all(ListeB,C,ListBC),
     evolue_pourtout(ListBC,Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),
-    affiche_evolution_Abox(Ls, Lie, [(I,all(R,C))|Lpt], Li, Lu, Abr, Ls1, Lie1, Lpt1, Li1, Lu1, Abr),
-    resolution(Lie1,Lpt1,Li1,Lu1,Ls1,Abr).
+    remove_doublons(Lie1, Lpt1, Li1, Lu1, Ls1,Lie2, Lpt2, Li2, Lu2, Ls2),
+    affiche_evolution_Abox(Ls, Lie, [(I,all(R,C))|Lpt], Li, Lu, Abr, Ls2, Lie2, Lpt2, Li2, Lu2, Abr),
+    resolution(Lie2,Lpt2,Li2,Lu2,Ls2,Abr).
 
 %transformation_or
 transformation_or(Lie,Lpt,Li,[(I,or(C1,C2))|Lu],Ls,Abr):-
     A=(I,C1),
-    evolue(A, Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),
-    affiche_evolution_Abox(Ls, Lie, Lpt, Li, [(I,or(C1,C2))|Lu], Abr, Ls1, Lie1, Lpt1, Li1, Lu1, Abr),
-    resolution(Lie1,Lpt1,Li1,Lu1,Ls1,Abr).
+    evolue_pourtout([A], Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),
+    remove_doublons(Lie1, Lpt1, Li1, Lu1, Ls1,Lie2, Lpt2, Li2, Lu2, Ls2),
+    affiche_evolution_Abox(Ls, Lie, Lpt, Li, [(I,or(C1,C2))|Lu], Abr, Ls2, Lie2, Lpt2, Li2, Lu2, Abr),
+    resolution(Lie2,Lpt2,Li2,Lu2,Ls2,Abr).
 
 transformation_or(Lie,Lpt,Li,[(I,or(C1,C2))|Lu],Ls,Abr):-
 	A=(I,C2),
-    evolue(A, Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),
-    affiche_evolution_Abox(Ls, Lie, Lpt, Li, [(I,or(C1,C2))|Lu], Abr, Ls1, Lie1, Lpt1, Li1, Lu1, Abr),
-    resolution(Lie1,Lpt1,Li1,Lu1,Ls1,Abr).
+    evolue_pourtout([A], Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),
+    remove_doublons(Lie1, Lpt1, Li1, Lu1, Ls1,Lie2, Lpt2, Li2, Lu2, Ls2),
+    affiche_evolution_Abox(Ls, Lie, Lpt, Li, [(I,or(C1,C2))|Lu], Abr, Ls2, Lie2, Lpt2, Li2, Lu2, Abr),
+    resolution(Lie2,Lpt2,Li2,Lu2,Ls2,Abr).
 
 %test_clash_unite
 test_clash_unite((I,C),[(I,not(C))|_]):-nl,write('Clash trouve:'),nl,
@@ -247,34 +255,43 @@ affiche((I,not(C))),nl,write('\tET\t'),affiche((I,C)),!.
 test_clash_unite((I,C),[(I1,X)|Li]):- nnf(not(C),NewC),(I\=I1;NewC\=X),test_clash_unite((I,C),Li),!.
 
 %test_no_clash
-test_no_clash([],_).
-test_no_clash([X|L], Ls):- not(test_clash_unite(X,Ls)), test_no_clash(L,Ls),!.
+test_no_clash_bis([],_).
+test_no_clash_bis([X|L], Ls):- not(test_clash_unite(X,Ls)), test_no_clash_bis(L,Ls),!.
 
+test_no_clash([]).
+test_no_clash([(I,C) | Ls]) :-
+    nnf(not(C), NC), not(member((I, NC), Ls)),
+    test_no_clash(Ls).
 
 
 
 %resolution
-resolution([],[],[],[],Ls,_):-nl,write('Fin resolution'),not(test_no_clash(Ls,Ls)),nl,
+resolution([],[],[],[],Ls,_):-nl,write('Fin resolution'),not(test_no_clash(Ls)),nl,
 write('Dans LS:'),affiche(Ls),!.
-resolution([(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr):-test_no_clash(Ls,Ls),complete_some([(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr),!.
-resolution([],Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr):-test_no_clash(Ls,Ls),transformation_and([],Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr),!.
-resolution([],[(I,all(R,C))|Lpt],[],Lu,Ls,Abr):-test_no_clash(Ls,Ls),deduction_all([],[(I,all(R,C))|Lpt],[],Lu,Ls,Abr),!.
-resolution([],[],[],[(I,or(C1,C2))|Lu],Ls,Abr):-test_no_clash(Ls,Ls),transformation_or([],[],[],[(I,or(C1,C2))|Lu],Ls,Abr).
+resolution([(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr):-test_no_clash(Ls),complete_some([(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr),!.
+resolution([],Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr):-test_no_clash(Ls),transformation_and([],Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr),!.
+resolution([],[(I,all(R,C))|Lpt],[],Lu,Ls,Abr):-test_no_clash(Ls),deduction_all([],[(I,all(R,C))|Lpt],[],Lu,Ls,Abr),!.
+resolution([],[],[],[(I,or(C1,C2))|Lu],Ls,Abr):-test_no_clash(Ls),transformation_or([],[],[],[(I,or(C1,C2))|Lu],Ls,Abr).
 
 %evolue
-evolue_pourtout([], _, _, _, _, _, _, _, _, _, _).
-evolue_pourtout([(I,some(R,C))|L],Lie, Lpt, Li, Lu, Ls, [(I,some(R,C))|Lie], Lpt1, Li1, Lu1, Ls1):-
-    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie, Lpt1, Li1, Lu1, Ls1),!.
-evolue_pourtout([(I,all(R,C))|L],Lie, Lpt, Li, Lu, Ls, Lie1, [(I,all(R,C))|Lpt], Li1, Lu1, Ls1):-
-    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie1, Lpt, Li1, Lu1, Ls1),!.
-evolue_pourtout([(I,and(C1,C2))|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, [(I,and(C1,C2))|Li], Lu1, Ls1):-
-    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li, Lu1, Ls1),!.
-evolue_pourtout([(I,or(C1,C2))|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, [(I,or(C1,C2))|Lu], Ls1):-
-    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu, Ls1),!.
-evolue_pourtout([(I,C)|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, [(I,C)|Ls]):-
-    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls),!.
-evolue_pourtout([(I,not(C))|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, [(I,not(C))|Ls]):-
-    evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls),!.
+evolue_pourtout([], Lie, Lpt, Li, Lu, Ls, Lie, Lpt, Li, Lu, Ls).
+evolue_pourtout([(I,some(R,C))|L],Lie, Lpt, Li, Lu, Ls, [(I,some(R,C))|Lie1], Lpt1, Li1, Lu1, Ls1):-
+    evolue_pourtout(L,[(I,some(R,C))|Lie], Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),!.
+
+evolue_pourtout([(I,all(R,C))|L],Lie, Lpt, Li, Lu, Ls, Lie1, [(I,all(R,C))|Lpt1], Li1, Lu1, Ls1):-
+    evolue_pourtout(L,Lie, [(I,all(R,C))|Lpt], Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),!.
+
+evolue_pourtout([(I,and(C1,C2))|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, [(I,and(C1,C2))|Li1], Lu1, Ls1):-
+    evolue_pourtout(L,Lie, Lpt, [(I,and(C1,C2))|Li], Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),!.
+
+evolue_pourtout([(I,or(C1,C2))|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, [(I,or(C1,C2))|Lu1], Ls1):-
+    evolue_pourtout(L,Lie, Lpt, Li, [(I,or(C1,C2))|Lu], Ls, Lie1, Lpt1, Li1, Lu1, Ls1),!.
+
+evolue_pourtout([(I,C)|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, [(I,C)|Ls1]):-
+    evolue_pourtout(L,Lie, Lpt, Li, Lu, [(I,C)|Ls], Lie1, Lpt1, Li1, Lu1, Ls1),!.
+
+evolue_pourtout([(I,not(C))|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, [(I,not(C))|Ls1]):-
+    evolue_pourtout(L,Lie, Lpt, Li, Lu, [(I,not(C))|Ls], Lie1, Lpt1, Li1, Lu1, Ls1),!.
     
 evolue((I,some(R,C)),Lie,Lpt,Li,Lu,Ls,[(I,some(R,C))|Lie], Lpt, Li,Lu, Ls):-!.
 evolue((I,all(R,C)),Lie,Lpt,Li,Lu,Ls,Lie, [(I,all(R,C))|Lpt], Li, Lu, Ls):-!.
