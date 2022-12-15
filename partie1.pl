@@ -117,6 +117,7 @@ terminologiques de la TBox.
 -----------------------------------------------------------*/
 traitement_Tbox_entiere([], []).
 traitement_Tbox_entiere([(A, X)|L1], [(A, Y)|L2]) :-
+    not(autoref(A,X,[(A,X)|L1],[(A,X)|L1])),
     testcnamena(A),
     concept(X),
     equiv(A, X),
