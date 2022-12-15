@@ -102,39 +102,8 @@ transformation_or(Lie, Lpt, Li, [(I, or(C1, C2))|Lu], Ls, Abr) :-
     resolution(Lie2, Lpt2, Li2, Lu2, Ls2, Abr),!.
 
 /*----------------------------------------------------------- 
-Une branche est-elle fermée ?
------------------------------------------------------------*/
-test_clash_unite((I, C), [(I, not(C))|_]) :-
-    nl,
-    write('Clash trouve:'),
-    nl,
-    affiche((I, C)),
-    nl,
-    write('\tET\t'),
-    affiche((I, not(C))),!.
-test_clash_unite((I, not(C)), [(I, C)|_]) :-
-    nl,
-    write('Clash trouve:'),
-    nl,
-    affiche((I, not(C))),
-    nl,
-    write('\tET\t'),
-    affiche((I, C)),!.
-test_clash_unite((I, C), [(I1, X)|Li]) :-
-    nnf(not(C), NewC),
-    (   I\=I1
-    ;   NewC\=X
-    ),
-    test_clash_unite((I, C), Li),!.
-
-/*----------------------------------------------------------- 
 Une branche est-elle ouverte ?
 -----------------------------------------------------------*/
-test_no_clash_bis([], _).
-test_no_clash_bis([X|L], Ls) :-
-    not(test_clash_unite(X, Ls)),
-    test_no_clash_bis(L, Ls),!.
-
 test_no_clash([]).
 test_no_clash([(I, C)|Ls]) :-
     nnf(not(C), NC),
