@@ -117,7 +117,7 @@ traitement_Abox_role([(A, B, R)|L]):-testiname(A), testiname(B),testrname(R), tr
 traitement_Abox(LC, LR):-aBox(X), tBox(Y),assert_Role(Z), traitement_Abox_concept_entiere(X, LC, Y), traitement_Abox_role(Z), concat([],Z,LR),!.
 
 %est_type_1
-est_type_1((A,X)):- testiname(A), concept(X).
+est_type_1((A,X)):- iname(A), concept(X).
 
 %acquisition_prop_type1
 acquisition_prop_type1(Abi,[(A,Y)|Abi],Tbox):-nl,write("entrez I."),nl,read(A),nl,write("Entrez C"),nl,read(C),
@@ -176,14 +176,14 @@ dynamic(compteur/1),
 retract(compteur(V)),
 dynamic(compteur/1),
 assert(compteur(V1)),nl,nl,nl,
-name(Nom,L2).
+name(Nom,L2),!.
 nombre(0,[]).
 nombre(X,L1) :-R is (X mod 10),
  Q is ((X-R)//10),
  chiffre_car(R,R1),
  char_code(R1,R2),
  nombre(Q,L),
- concat(L,[R2],L1).
+ concat(L,[R2],L1),!.
 chiffre_car(0,'0').
 chiffre_car(1,'1').
 chiffre_car(2,'2').
@@ -205,7 +205,7 @@ ajouter_deduction_all([B|ListeB],C,[(B,C)|Ls]):-ajouter_deduction_all(ListeB,C,L
 
 
 %complete_some
-complete_some([(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr):-genere(B),
+complete_some([(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr):-nl,write('SOMEEEEE !!'),genere(B),
     A=(B,C),
     evolue(A, Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls1),
     affiche_evolution_Abox(Ls, [(I,some(R,C))|Lie], Lpt, Li, Lu, Abr, Ls1, Lie1, Lpt1, Li1, Lu1, [(I,B,R)|Abr]),
@@ -251,14 +251,15 @@ test_no_clash([],_).
 test_no_clash([X|L], Ls):- not(test_clash_unite(X,Ls)), test_no_clash(L,Ls),!.
 
 
+
+
 %resolution
 resolution([],[],[],[],Ls,_):-nl,write('Fin resolution'),not(test_no_clash(Ls,Ls)),nl,
 write('Dans LS:'),affiche(Ls),!.
-resolution(Lie,Lpt,Li,Lu,Ls,Abr):-test_no_clash(Ls,Ls),complete_some(Lie,Lpt,Li,Lu,Ls,Abr).
-resolution([],Lpt,Li,Lu,Ls,Abr):-test_no_clash(Ls,Ls),transformation_and([],Lpt,Li,Lu,Ls,Abr).
-resolution([],Lpt,[],Lu,Ls,Abr):-test_no_clash(Ls,Ls),
-    deduction_all([],Lpt,[],Lu,Ls,Abr).
-resolution([],[],[],Lu,Ls,Abr):-test_no_clash(Ls,Ls),transformation_or([],[],[],Lu,Ls,Abr).
+resolution([(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr):-test_no_clash(Ls,Ls),complete_some([(I,some(R,C))|Lie],Lpt,Li,Lu,Ls,Abr),!.
+resolution([],Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr):-test_no_clash(Ls,Ls),transformation_and([],Lpt,[(I,and(C1,C2))|Li],Lu,Ls,Abr),!.
+resolution([],[(I,all(R,C))|Lpt],[],Lu,Ls,Abr):-test_no_clash(Ls,Ls),deduction_all([],[(I,all(R,C))|Lpt],[],Lu,Ls,Abr),!.
+resolution([],[],[],[(I,or(C1,C2))|Lu],Ls,Abr):-test_no_clash(Ls,Ls),transformation_or([],[],[],[(I,or(C1,C2))|Lu],Ls,Abr).
 
 %evolue
 evolue_pourtout([], _, _, _, _, _, _, _, _, _, _).
@@ -275,12 +276,12 @@ evolue_pourtout([(I,C)|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, [(I,C)|Ls]
 evolue_pourtout([(I,not(C))|L],Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, [(I,not(C))|Ls]):-
     evolue_pourtout(L,Lie, Lpt, Li, Lu, Ls, Lie1, Lpt1, Li1, Lu1, Ls),!.
     
-evolue((I,some(R,C)),Lie,Lpt,Li,Lu,Ls,[(I,some(R,C))|Lie], Lpt, Li,Lu, Ls).
-evolue((I,all(R,C)),Lie,Lpt,Li,Lu,Ls,Lie, [(I,all(R,C))|Lpt], Li, Lu, Ls).
-evolue((I,and(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie, Lpt, [(I,and(C1,C2))|Li], Lu, Ls).
-evolue((I,or(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie, Lpt, Li, [(I,or(C1,C2))|Lu], Ls).
-evolue((I,C),Lie,Lpt,Li,Lu,Ls,Lie, Lpt, Li, Lu, [(I,C)|Ls]):-testcnamea(C).
-evolue((I,not(C)),Lie,Lpt,Li,Lu,Ls,Lie, Lpt, Li, Lu, [(I,not(C))|Ls]):-testcnamea(C).
+evolue((I,some(R,C)),Lie,Lpt,Li,Lu,Ls,[(I,some(R,C))|Lie], Lpt, Li,Lu, Ls):-!.
+evolue((I,all(R,C)),Lie,Lpt,Li,Lu,Ls,Lie, [(I,all(R,C))|Lpt], Li, Lu, Ls):-!.
+evolue((I,and(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie, Lpt, [(I,and(C1,C2))|Li], Lu, Ls):-!.
+evolue((I,or(C1,C2)),Lie,Lpt,Li,Lu,Ls,Lie, Lpt, Li, [(I,or(C1,C2))|Lu], Ls):-!.
+evolue((I,C),Lie,Lpt,Li,Lu,Ls,Lie, Lpt, Li, Lu, [(I,C)|Ls]):-testcnamea(C),!.
+evolue((I,not(C)),Lie,Lpt,Li,Lu,Ls,Lie, Lpt, Li, Lu, [(I,not(C))|Ls]):-testcnamea(C),!.
 
 %affiche
 affiche([]).
