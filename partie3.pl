@@ -34,7 +34,7 @@ tri_Abox([(I, not(C))|Abi], Lie, Lpt, Li, Lu, [(I, not(C))|Ls]) :-
 Enlève les doublons dans les listes
 -----------------------------------------------------------*/
 remove_doublons(Ls, Lie, Lpt, Li, Lu, Ls1, Lie1, Lpt1, Li1, Lu1):-
-    sort(Ls,Ls1), sort(Lie,Lie1), sort(Lpt,Lpt1), sort(Li,Li1), sort(Lu,Lu1),!.
+    sort(Ls, Ls1), sort(Lie, Lie1), sort(Lpt, Lpt1), sort(Li, Li1), sort(Lu, Lu1),!.
 
 /*-----------------------------------------------------------
 Règle ∃
@@ -177,6 +177,7 @@ affiche([]).
 affiche([X|L]) :-
     affiche(X),
     affiche(L).
+
 affiche((I, some(R, C))) :-
     nl,
     affiche(I),

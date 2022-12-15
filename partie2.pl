@@ -6,9 +6,9 @@ saisie_et_traitement_prop_a_demontrer(Abi, Abi1, Tbox) :-
   nl,
   write('Entrer le numero du type de proposition que l\'on souhaite demontrer :'),
   nl,
-  write('\t1 - Une instance donnee appartient à un concept donne.'),
+  write('\t1. - Une instance donnee appartient a un concept donne.'),
   nl,
-  write('\t2 - Deux concepts n\'ont pas d\'elements en commun (ils ont une intersection vide).'),
+  write('\t2. - Deux concepts n\'ont pas d\'elements en commun (ils ont une intersection vide).'),
   nl,
   read(R),
   suite(R, Abi, Abi1, Tbox).
